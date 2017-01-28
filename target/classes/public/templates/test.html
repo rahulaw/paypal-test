@@ -1,0 +1,25 @@
+<html>
+<head>
+    <script type="text/javascript">
+        User = function() {
+          console.log("created a new used");
+            this.name = null;
+        };
+
+        User.prototype.setName = function (name) {
+            this.name = name ;
+            console.log("calling func");
+        };
+
+        User.prototype.getName = function (name) {
+            return this.name;
+        };
+
+        var x = new User();
+        x.setName("rahul");
+        console.log(x.getName());
+
+    </script>
+</head>
+
+</html>

@@ -1,0 +1,62 @@
+server:
+  type: default
+  rootPath: /api/
+  applicationContextPath: /
+  applicationConnectors:
+     - type: http
+       port: 8080
+  adminConnectors:
+     - type: http
+       port: 8081
+
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: /var/log/test/access.log
+        archivedLogFilenamePattern: /var/log/test/access-%d.log
+        archivedFileCount: 14
+
+databaseConfig:
+  driverClass: com.mysql.jdbc.Driver
+  user: root
+  password: ""
+  url: jdbc:mysql://localhost/paypal
+  properties:
+    charSet: UTF-8
+  maxWaitForConnectionMs: 1000
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: true
+#  evictionInterval: 10s
+#  minIdleTime: 1 minute
+
+masterAdserverDB:
+  driverClass: com.mysql.jdbc.Driver
+  user: root
+  password: ""
+  url: jdbc:mysql://localhost/paypal
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: true
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
+slaveAdserverDB:
+  driverClass: com.mysql.jdbc.Driver
+  user: root
+  password: ""
+  url: jdbc:mysql://localhost/paypal
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: true
+  evictionInterval: 10s
+  minIdleTime: 1 minute

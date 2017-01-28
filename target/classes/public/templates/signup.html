@@ -1,0 +1,43 @@
+<div class="container">
+    <div class="row" style="text-align:center">
+        <h2>Paypal Signup</h2>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+
+        </div>
+        <div class="col-md-4">
+            <form name="signup_form" >
+                <div class="form-group">
+                    <input ng-model="username" name="username" type="text" class="form-control" placeholder="Username" required>
+                    <p ng-if="showErrors && signup_form.username.$invalid" class="alert alert-danger">
+                        user name is required
+                    </p>
+                </div>
+                <div class="form-group">
+                    <input ng-model="email" name="email" type="email" class="form-control" placeholder="Email Id" required>
+                    <p ng-if="showErrors && signup_form.email.$invalid" class="alert alert-danger">
+                        Please enter a valid emailId
+                    </p>
+                </div>
+                <div class="form-group">
+                    <input ng-model="password" name="password" type="password" class="form-control" placeholder="Password" required>
+                    <p ng-if="showErrors && signup_form.password.$invalid" class="alert alert-danger">
+                        Please enter a valid password
+                    </p>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <button ng-click="submit()" class="form-control btn btn-login"> Signup </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-4">
+
+        </div>
+    </div>
+</div>
