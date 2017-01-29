@@ -36,4 +36,7 @@ public interface TokenDAO {
     @RegisterMapper(Tokens.TokenMapper.class)
     @SqlQuery("SELECT * from tokens where token = :token  ")
     Tokens getToken(@Bind("token") String token);
+
+    @SqlUpdate("delete from " + tableName + " where token = :token")
+    void deleteToken(@Bind("token") String token);
 }

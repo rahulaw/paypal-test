@@ -7,6 +7,9 @@ app.controller('SignupController', function($scope,$rootScope,$timeout,$http,$lo
         $rootScope.token = null;
         $rootScope.userName = null;
 
+        $scope.isSuccess = null;
+        $scope.error_message = null;
+
         $scope.submit = function() {
             $scope.showErrors = true;
 
@@ -14,9 +17,11 @@ app.controller('SignupController', function($scope,$rootScope,$timeout,$http,$lo
                 return;
             }
 
-            var data = {"nick_name" : $scope.username , "email" : $scope.email, "password" : $scope.password };
+            var data = {"user_name" : $scope.username , "email" : $scope.email, "password" : $scope.password };
             $http.post('/api/v1/users', data).then(function(response){
                 console.log(response.data);
+
+                $scope.isSuccess = true;
 
                 $rootScope.token = response.data.token;
                 $rootScope.userName = response.data.userName;
@@ -24,7 +29,9 @@ app.controller('SignupController', function($scope,$rootScope,$timeout,$http,$lo
                 $location.path("/home");
 
             }, function(error){
-                console.log(error);
+                console.log(error.data);
+                $scope.isSuccess = false;
+                $scope.error_message = error.data.message;
             });
 
             console.log($scope.username);

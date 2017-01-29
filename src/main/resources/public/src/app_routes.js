@@ -18,6 +18,14 @@ app.config(function($routeProvider) {
             templateUrl : '/templates/payment.html',
             controller  : 'PaymentController'
         })
+        .when('/logout', {
+            templateUrl : '/templates/logout.html',
+            controller  : 'LogoutController'
+        })
+        .when('/transactions', {
+            templateUrl : '/templates/transactions.html',
+            controller  : 'TransactionController'
+        })
         .otherwise({
             redirectTo: '/login'
         });

@@ -3,6 +3,7 @@ package com.paypal.test.filters;
 import com.google.inject.Inject;
 import com.paypal.test.annotations.Secured;
 import com.paypal.test.api.TokenAPI;
+import com.paypal.test.models.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Priority;
@@ -36,10 +37,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         try {
             isValidToken = tokenAPI.validateToken(token);
         } catch (Exception e) {
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity("error in validating token").build());
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity(new ErrorResponse("error in validating token")).build());
         }
         if(!isValidToken) {
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity("token is not valid").build());
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity(new ErrorResponse("token is not valid")).build());
         }
     }
 

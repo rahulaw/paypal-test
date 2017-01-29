@@ -17,13 +17,13 @@ public interface UserDAO {
 
     @SqlUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " (" +
             "  `id` bigint(20) NOT NULL AUTO_INCREMENT," +
-            "  `nick_name` varchar(100) NOT NULL," +
+            "  `user_name` varchar(100) NOT NULL," +
             "  `email` varchar(100) NOT NULL," +
             "  `password` varchar(100) NOT NULL," +
             "  `is_admin` tinyint(4) NOT NULL default 0 ," +
             "  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP," +
             "  PRIMARY KEY (`id`)," +
-            "  UNIQUE KEY `nick_name` (`nick_name`)," +
+            "  UNIQUE KEY `user_name` (`user_name`)," +
             "  UNIQUE KEY `email` (`email`)" +
             ") ENGINE=InnoDB;")
     void createUsersTable();
@@ -33,14 +33,22 @@ public interface UserDAO {
     List<User> getAllUsers(@Bind("limit") int limit,@Bind("offset") int offset);
 
     @RegisterMapper(User.UserMapper.class)
-    @SqlQuery("select * from users where nick_name = :userName and password = :password")
+    @SqlQuery("select * from users where user_name = :userName and password = :password")
     User validateUser(@Bind("userName") String userName,@Bind("password") String password);
 
 
-    @SqlUpdate("insert into " + tableName + " (nick_name, email, password) values (:nickName, :email, :password)")
-    void createNewUser(@Bind("nickName") String nickName, @Bind("email") String email, @Bind("password") String password);
+    @SqlUpdate("insert into " + tableName + " (user_name, email, password) values (:userName, :email, :password)")
+    void createNewUser(@Bind("userName") String userName, @Bind("email") String email, @Bind("password") String password);
 
     @RegisterMapper(User.UserMapper.class)
     @SqlQuery("select * from users where email = :email")
     User getUserByEmail(@Bind("email") String email);
+
+    @RegisterMapper(User.UserMapper.class)
+    @SqlQuery("select * from users where user_name = :userName")
+    User getUserByUsername(@Bind("userName") String userName);
+
+    @RegisterMapper(User.UserMapper.class)
+    @SqlQuery("select u.* from users u join tokens t on u.id = t.user_id where t.token = :token")
+    User getUserByToken(@Bind("token") String token);
 }

@@ -1,29 +1,40 @@
-LoginController = function($scope,$timeout) {
-	var self = this;
-    
-    self.scope = $scope;
-    self.timeout = $timeout;
+app.controller('LoginController',function($scope,$rootScope,$timeout,$http,$location) {
+        $scope.username = null;
+        $scope.password = null;
+        $scope.showErrors = false;
 
-    self.initialize();
-    self.setupScopeMethods();
-    
+        $scope.isSuccess = null;
+        $scope.error_message = null;
 
-    
-};
-LoginController.prototype.initialize = function() {
-    var self = this;
-    self.scope.username = null;
-    self.scope.password = null;
 
-};
+        $rootScope.token = null;
+        $rootScope.userName = null;
 
-LoginController.prototype.setupScopeMethods = function() {
-    var self = this;
-}
-LoginController.prototype.forceUpdateView = function() {
-            var self = this;
-            self.timeout(function(){
-                self.scope.$apply(); 
+        $scope.submit = function() {
+            $scope.showErrors = true;
+
+            if($scope.login_form.$valid != true) {
+                return;
+            }
+
+            var data = {"user_name" : $scope.username , "password" : $scope.password };
+            $http.post('/api/v1/authentication/login', data).then(function(response){
+                $scope.isSuccess = true;
+
+                console.log(response.data);
+
+                $rootScope.token = response.data.token;
+                $rootScope.userName = $scope.username;
+
+                $location.path("/home");
+
+            }, function(error){
+                $scope.isSuccess = false;
+                console.log(error.data);
+                $scope.error_message = error.data.message;
             });
-}
-app.controller('LoginController',LoginController);
+
+        }
+    }
+);
+

@@ -33,6 +33,23 @@
                         </div>
                     </div>
                 </div>
+
+                <div ng-if="isSuccess == true" class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <p class="alert alert-success"> Successfully signed up </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-if="isSuccess == false" class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <p  class="alert alert-danger"> {{ error_message }} </p>
+                        </div>
+                    </div>
+                </div>
+
             </form>
         </div>
 

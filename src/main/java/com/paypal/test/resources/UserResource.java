@@ -6,6 +6,7 @@ import com.paypal.test.api.UserAPI;
 import com.paypal.test.entities.User;
 import com.paypal.test.models.CreateUserRequest;
 import com.paypal.test.models.CreateUserResponse;
+import com.paypal.test.models.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.ConstraintViolation;
@@ -41,10 +42,10 @@ public class UserResource {
         List<User> users = new ArrayList<User>();
         try {
             users = userAPI.getAllUserInfo(limit, offset);
+            return Response.status(Response.Status.OK).entity(users).build();
         } catch(Exception e) {
-            Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorResponse(e.getMessage())).build();
         }
-        return Response.status(Response.Status.OK).entity(users).build();
     }
 
     @POST
@@ -56,16 +57,15 @@ public class UserResource {
             checkNotNull(createUserRequest, "request cannot be null");
             Set<ConstraintViolation<CreateUserRequest>> violations = validator.validate(createUserRequest);
             if (violations.size() > 0) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse("Please enter mandatory fields")).build();
             }
-
-            User user = userAPI.createUser(createUserRequest);
-            String token = userAPI.issueToken(user.getId());
-            createUserResponse = new CreateUserResponse(token, user.getNickName());
+            createUserResponse = userAPI.createNewUser(createUserRequest);
+            return Response.status(Response.Status.OK).entity(createUserResponse).build();
+        } catch (RuntimeException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorResponse("Error in creating the user")).build();
         }
-        return Response.status(Response.Status.OK).entity(createUserResponse).build();
     }
 
 }

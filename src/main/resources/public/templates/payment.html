@@ -10,7 +10,7 @@
 
         <div class="sidebar-wrapper">
             <div class="logo">
-                <a href="http://www.creative-tim.com" class="simple-text">
+                <a class="simple-text">
                     Paypal
                 </a>
             </div>
@@ -27,6 +27,13 @@
                     <a href="index.html#!/payment">
                         <i class="pe-7s-graph"></i>
                         <p>Transfer Money</p>
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="index.html#!/transactions">
+                        <i class="pe-7s-graph"></i>
+                        <p>Transaction History</p>
                     </a>
                 </li>
 
@@ -57,13 +64,14 @@
 
                     <ul class="nav navbar-nav navbar-right">
                         <li>
-                            <a href="">
-                                Account
+                            <a href="index.html#!/logout">
+                                Logout
                             </a>
                         </li>
-
-
                     </ul>
+
+
+
                 </div>
             </div>
         </nav>
@@ -72,9 +80,9 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row" >
-                    <h2>
+                    <h3>
                         your current balance is {{ accountDetails.amount }}
-                    </h2>
+                    </h3>
                 </div>
                 <div class="row">
                     <div class="col-md-8">

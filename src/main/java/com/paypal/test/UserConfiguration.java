@@ -15,6 +15,16 @@ import java.util.Map;
  * Created by rahulaw on 28/01/17.
  */
 public class UserConfiguration extends Configuration {
+
+    @Getter
+    private double defaultAccountBalance = 100.0;
+
+    @Getter
+    private int tokenExpiryHours = 4;
+
+    @Getter
+    private double minAmountInAccount = 40.0;
+
     @Valid
     @NotNull
     @JsonProperty

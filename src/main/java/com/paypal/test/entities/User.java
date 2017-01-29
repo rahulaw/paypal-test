@@ -13,14 +13,14 @@ import java.sql.SQLException;
 @Getter
 public class User {
     private long id ;
-    private String nickName ;
+    private String userName ;
     private String email;
     private boolean isAdmin ;
     private String password ;
 
-    public User(long id, String nickName, String email, boolean isAdmin, String password) {
+    public User(long id, String userName, String email, boolean isAdmin, String password) {
         this.id = id;
-        this.nickName = nickName;
+        this.userName = userName;
         this.email = email;
         this.isAdmin = isAdmin;
         this.password = password;
@@ -28,7 +28,7 @@ public class User {
 
     public static class UserMapper implements ResultSetMapper<User> {
         public User map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-            return new User(r.getLong("id"), r.getString("nick_name"), r.getString("email") , r.getBoolean("is_admin") , r.getString("password"));
+            return new User(r.getLong("id"), r.getString("user_name"), r.getString("email") , r.getBoolean("is_admin") , r.getString("password"));
         }
     }
 }

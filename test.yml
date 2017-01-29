@@ -1,3 +1,7 @@
+defaultAccountBalance: 200.0
+tokenExpiryHours: 4
+minAmountInAccount: 40.0
+
 server:
   type: default
   rootPath: /api/

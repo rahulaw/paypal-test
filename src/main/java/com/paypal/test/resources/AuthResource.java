@@ -3,13 +3,20 @@ package com.paypal.test.resources;
 import com.google.inject.Inject;
 import com.paypal.test.annotations.Secured;
 import com.paypal.test.api.UserAPI;
-import com.paypal.test.entities.User;
+import com.paypal.test.models.ErrorResponse;
 import com.paypal.test.models.UserAuthRequest;
+import com.paypal.test.models.UserAuthResponse;
+import com.paypal.test.utils.TokenHelper;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -22,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AuthResource {
 
     private final UserAPI userAPI;
+    private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -29,17 +37,17 @@ public class AuthResource {
     public Response loginUser(UserAuthRequest userAuthRequest) {
         try {
             checkNotNull(userAuthRequest, "request cannot be null");
-            checkNotNull(userAuthRequest.getUserName(), "user name cannot be null");
-            checkNotNull(userAuthRequest.getPassword(), "password cannot be null");
+            Set<ConstraintViolation<UserAuthRequest>> violations = validator.validate(userAuthRequest);
+            if (violations.size() > 0) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse("Please enter mandatory fields")).build();
+            }
 
-            User user = userAPI.authenticate(userAuthRequest.getUserName(), userAuthRequest.getPassword());
-            //Should we issue a new token every time we get a login request ??
-            String token = userAPI.issueToken(user.getId());
-            return Response.ok(token).build();
+            UserAuthResponse userAuthResponse = userAPI.login(userAuthRequest);
+            return Response.ok(userAuthResponse).build();
         } catch (NotAuthorizedException e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(new ErrorResponse("User / password is incorrect")).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         }
     }
 
@@ -47,13 +55,15 @@ public class AuthResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/logout")
-    public Response logoutUser() {
+    public Response logoutUser(@HeaderParam(HttpHeaders.AUTHORIZATION) String authHeader) {
         try {
-            return Response.ok("").build();
+            String token = TokenHelper.getTokenFromHeader(authHeader);
+            userAPI.logout(token);
+            return Response.ok(new UserAuthResponse()).build();
         } catch (NotAuthorizedException e) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(new ErrorResponse("User is already logged out")).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         }
     }
 

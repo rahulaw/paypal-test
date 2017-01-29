@@ -1,6 +1,5 @@
 app.controller('PaymentController', function($scope,$rootScope,$timeout,$http,$location) {
 
-        $rootScope.token = "0bb2365b-7057-440a-b28f-db3b6c4466a2" ;
         $scope.email = null;
         $scope.amount = null;
         $scope.error_message = null;

@@ -5,6 +5,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.paypal.test.dao.AccountDAO;
 import com.paypal.test.dao.TokenDAO;
+import com.paypal.test.dao.TransactionHistoryDAO;
 import com.paypal.test.dao.UserDAO;
 import com.paypal.test.dao.core.SessionFactoryInitializer;
 import org.hibernate.SessionFactory;
@@ -60,6 +61,12 @@ public class UserModule extends AbstractModule {
     @Singleton
     AccountDAO provideAccountDAO() {
         return masterJdbi.onDemand(AccountDAO.class);
+    }
+
+    @Provides
+    @Singleton
+    TransactionHistoryDAO provideTransactionHistoryDAO() {
+        return masterJdbi.onDemand(TransactionHistoryDAO.class);
     }
 
 }

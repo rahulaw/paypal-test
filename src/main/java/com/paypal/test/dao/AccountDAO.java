@@ -13,6 +13,17 @@ public interface AccountDAO {
 
     String tableName = "accounts";
 
+    @SqlUpdate("CREATE TABLE `accounts` (\n" +
+            "  `id` bigint(10) NOT NULL AUTO_INCREMENT,\n" +
+            "  `user_id` bigint(10) NOT NULL,\n" +
+            "  `balance` double NOT NULL,\n" +
+            "  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n" +
+            "  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n" +
+            "  PRIMARY KEY (`id`),\n" +
+            "  UNIQUE KEY `user` (`user_id`)\n" +
+            ") ENGINE=InnoDB")
+    void createTable();
+
     @SqlUpdate("insert into " + tableName + " (user_id, balance) values (:userId, :balance)")
     void createAccount(@Bind("userId") long userId, @Bind("balance") double balance);
 
