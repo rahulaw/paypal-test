@@ -1,1 +1,1 @@
-app = angular.module('paypalDemoApplication' , ["ngRoute"]);
+app = angular.module('paypalDemoApplication' , ["ngRoute","ngCookies"]);

@@ -29,7 +29,7 @@ public interface UserDAO {
     void createUsersTable();
 
     @RegisterMapper(User.UserMapper.class)
-    @SqlQuery("select * from users limit :limit offset :offset")
+    @SqlQuery("select * from users where is_admin = 0 limit :limit offset :offset")
     List<User> getAllUsers(@Bind("limit") int limit,@Bind("offset") int offset);
 
     @RegisterMapper(User.UserMapper.class)
@@ -37,8 +37,8 @@ public interface UserDAO {
     User validateUser(@Bind("userName") String userName,@Bind("password") String password);
 
 
-    @SqlUpdate("insert into " + tableName + " (user_name, email, password) values (:userName, :email, :password)")
-    void createNewUser(@Bind("userName") String userName, @Bind("email") String email, @Bind("password") String password);
+    @SqlUpdate("insert into " + tableName + " (user_name, email, password, is_admin) values (:userName, :email, :password, :isAdmin)")
+    void createNewUser(@Bind("userName") String userName, @Bind("email") String email, @Bind("password") String password, @Bind("isAdmin") int admin);
 
     @RegisterMapper(User.UserMapper.class)
     @SqlQuery("select * from users where email = :email")

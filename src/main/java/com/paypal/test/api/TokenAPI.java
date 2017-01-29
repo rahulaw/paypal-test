@@ -1,8 +1,8 @@
 package com.paypal.test.api;
 
 import com.google.inject.Inject;
-import com.paypal.test.UserConfiguration;
 import com.paypal.test.dao.TokenDAO;
+import com.paypal.test.UserConfiguration;
 import com.paypal.test.entities.Tokens;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.time.DateUtils;

@@ -22,4 +22,6 @@ public class CreateUserRequest {
     String email;
     @NotEmpty
     String password;
+    @JsonProperty("is_admin")
+    int isAdmin = 0;
 }

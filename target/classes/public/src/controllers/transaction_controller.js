@@ -12,7 +12,9 @@ app.controller('TransactionController',function($scope,$rootScope,$timeout,$http
                     console.log(response.data);
                     $scope.transactionDetails = response.data.transactionHistories;
                 }, function (error) {
-
+                    if(error.status == 401) {
+                        $location.path("/login");
+                    }
                 });
         }
 

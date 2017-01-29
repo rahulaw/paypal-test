@@ -13,6 +13,9 @@ import com.paypal.test.models.CreateUserResponse;
 import com.paypal.test.models.UserAuthRequest;
 import com.paypal.test.models.UserAuthResponse;
 import lombok.RequiredArgsConstructor;
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.TransactionIsolationLevel;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -32,6 +35,7 @@ public class UserAPI {
     private final AccountDAO accountDAO;
     private final TokenAPI tokenAPI;
     private final UserConfiguration userConfiguration;
+    private final DBI jdbi;
     private static final String salt = "Random$SaltValue#WithSpecialCharacters12@$@4&#%^$*";
 
     public UserAuthResponse login(UserAuthRequest userAuthRequest) {
@@ -44,10 +48,6 @@ public class UserAPI {
         User user = authenticate(userAuthRequest.getUserName(), password);
         String token = issueToken(user.getId());
         return new UserAuthResponse(token);
-    }
-
-    public String issueToken(long userId) {
-        return tokenAPI.issueToken(userId);
     }
 
     public List<User> getAllUserInfo(int limit, int offset) {
@@ -64,6 +64,10 @@ public class UserAPI {
         tokenAPI.disableToken(token);
     }
 
+    private String issueToken(long userId) {
+        return tokenAPI.issueToken(userId);
+    }
+
     private User authenticate(String userName, String password) {
         User user = userDAO.validateUser(userName, password);
         if(user == null) {
@@ -76,20 +80,46 @@ public class UserAPI {
         User user = null ;
         try {
             checkValidEmail(createUserRequest.getEmail());
-            checkUniqueUserName(createUserRequest.getUserName());
             checkUniqueEmail(createUserRequest.getEmail());
-
-            //Do this inside a transaction
-            userDAO.createNewUser(createUserRequest.getUserName(), createUserRequest.getEmail(), getMd5Password(createUserRequest.getPassword()));
-            user = userDAO.getUserByEmail(createUserRequest.getEmail());
-            accountDAO.createAccount(user.getId(), userConfiguration.getDefaultAccountBalance());
+            checkUniqueUserName(createUserRequest.getUserName());
+            user = createUserAndAccount(createUserRequest);
         } catch(EmailIdNotValidException | EmailIdNotUniqueException | UserNameNotUniqueException | NoSuchAlgorithmException e1) {
             throw new RuntimeException(e1.getMessage());
         }
         return user ;
     }
 
-    private String getMd5Password(String password) throws NoSuchAlgorithmException {
+    private User createUserAndAccount(CreateUserRequest createUserRequest) throws NoSuchAlgorithmException {
+        User user = null;
+        Handle handle = jdbi.open();
+        try {
+            if (handle == null) {
+                throw new RuntimeException("Database Connection issue");
+            }
+
+            handle.setTransactionIsolation(TransactionIsolationLevel.READ_COMMITTED);
+            handle.begin();
+
+            UserDAO userDAO = handle.attach(UserDAO.class);
+            AccountDAO accountDAO = handle.attach(AccountDAO.class);
+
+            userDAO.createNewUser(createUserRequest.getUserName(), createUserRequest.getEmail(), getMd5Password(createUserRequest.getPassword()), createUserRequest.getIsAdmin());
+            user = userDAO.getUserByEmail(createUserRequest.getEmail());
+            accountDAO.createAccount(user.getId(), userConfiguration.getDefaultAccountBalance());
+
+            handle.commit();
+            handle.close();
+
+        } catch (Exception e) {
+            assert handle != null;
+            handle.rollback();
+            handle.close();
+            throw new RuntimeException("Error in creating the user");
+        }
+        return user;
+    }
+
+    public String getMd5Password(String password) throws NoSuchAlgorithmException {
         String md5 = null;
         if(null == password) return null;
         try {

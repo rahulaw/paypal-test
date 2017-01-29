@@ -1,4 +1,4 @@
-app.controller('LoginController',function($scope,$rootScope,$timeout,$http,$location) {
+app.controller('LoginController',function($scope,$rootScope,$timeout,$http,$location,$cookies) {
         $scope.username = null;
         $scope.password = null;
         $scope.showErrors = false;
@@ -6,6 +6,12 @@ app.controller('LoginController',function($scope,$rootScope,$timeout,$http,$loca
         $scope.isSuccess = null;
         $scope.error_message = null;
 
+        if($cookies.get("token") != null && $cookies.get("token") != undefined) {
+            $rootScope.token = $cookies.get("token");
+            $rootScope.userName = $cookies.get("userName");
+            $location.path("/home");
+            return;
+        }
 
         $rootScope.token = null;
         $rootScope.userName = null;
@@ -25,6 +31,9 @@ app.controller('LoginController',function($scope,$rootScope,$timeout,$http,$loca
 
                 $rootScope.token = response.data.token;
                 $rootScope.userName = $scope.username;
+
+                $cookies.put("token",response.data.token);
+                $cookies.put("userName",$scope.username);
 
                 $location.path("/home");
 

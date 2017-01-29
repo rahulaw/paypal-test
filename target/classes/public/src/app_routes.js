@@ -1,7 +1,5 @@
-// configure our routes
 app.config(function($routeProvider) {
     $routeProvider
-    // route for the home page
         .when('/login', {
             templateUrl : '/templates/login.html',
             controller  : 'LoginController'
@@ -25,6 +23,14 @@ app.config(function($routeProvider) {
         .when('/transactions', {
             templateUrl : '/templates/transactions.html',
             controller  : 'TransactionController'
+        })
+        .when('/admin', {
+            templateUrl : '/templates/admin.html',
+            controller  : 'AdminController'
+        })
+        .when('/admin_home', {
+            templateUrl : '/templates/admin_home.html',
+            controller  : 'AdminHomeController'
         })
         .otherwise({
             redirectTo: '/login'

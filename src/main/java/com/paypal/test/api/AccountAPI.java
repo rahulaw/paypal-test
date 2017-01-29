@@ -15,6 +15,9 @@ import com.paypal.test.models.AccountDetailResponse;
 import com.paypal.test.models.TransactionResponse;
 import com.paypal.test.models.TransferBalanceRequest;
 import lombok.RequiredArgsConstructor;
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.TransactionIsolationLevel;
 
 import java.util.List;
 
@@ -28,6 +31,7 @@ public class AccountAPI {
     private final TokenDAO tokenDAO;
     private final UserDAO userDAO;
     private final TransactionHistoryDAO transactionHistoryDAO;
+    private final DBI jdbi;
     private final UserConfiguration userConfiguration;
 
     public AccountDetailResponse getBalance(String token) {
@@ -52,33 +56,60 @@ public class AccountAPI {
         }
 
         User fromUser = userDAO.getUserByToken(token);
-        Account account = accountDAO.getAccountDetails(fromUser.getId());
-        double balanceLeft = account.getAmount() - request.getAmount() ;
+        Account fromAccount = accountDAO.getAccountDetails(fromUser.getId());
+        double balanceLeft = fromAccount.getAmount() - request.getAmount() ;
 
         if(balanceLeft <= userConfiguration.getMinAmountInAccount()) {
             throw new RuntimeException("Insufficient balance");
         }
 
-        //Do this inside a transaction
-        Account destAccount = accountDAO.getAccountDetailsByEmail(request.getUserEmail());
-        accountDAO.updateAmount(account.getId(), balanceLeft);
-        accountDAO.updateAmount(destAccount.getId(), destAccount.getAmount() + request.getAmount());
-        addHistory(AccountAction.TRANSFERRED, fromUser.getEmail(), request.getUserEmail(), account.getId(), destAccount.getId(), request.getAmount());
-        addHistory(AccountAction.RECEIVED , fromUser.getEmail(), request.getUserEmail(), account.getId(), destAccount.getId(), request.getAmount());
-
+        updateBalance(request, fromUser, fromAccount);
         return new AccountDetailResponse(balanceLeft);
     }
 
-    private void addHistory(AccountAction action, String fromUser, String toUser, long fromAccountId, long toAccountId, double amount) {
+    private void updateBalance(TransferBalanceRequest request, User fromUser, Account fromAccount) {
+        Handle handle = jdbi.open();
+        try {
+            if (handle == null) {
+                throw new RuntimeException("Database Connection issue");
+            }
+
+            handle.setTransactionIsolation(TransactionIsolationLevel.READ_COMMITTED);
+            handle.begin();
+
+            AccountDAO accountDAO = handle.attach(AccountDAO.class);
+            TransactionHistoryDAO transactionHistoryDAO = handle.attach(TransactionHistoryDAO.class);
+
+            double balanceLeft = fromAccount.getAmount() - request.getAmount();
+            Account destAccount = accountDAO.getAccountDetailsByEmail(request.getUserEmail());
+
+            accountDAO.updateAmount(fromAccount.getId(), balanceLeft);
+            accountDAO.updateAmount(destAccount.getId(), destAccount.getAmount() + request.getAmount());
+
+            addHistory(transactionHistoryDAO, AccountAction.TRANSFERRED, fromUser.getEmail(), request.getUserEmail(), fromAccount.getId(), destAccount.getId(), request.getAmount());
+            addHistory(transactionHistoryDAO, AccountAction.RECEIVED, fromUser.getEmail(), request.getUserEmail(), fromAccount.getId(), destAccount.getId(), request.getAmount());
+
+            handle.commit();
+            handle.close();
+
+        } catch (Exception e) {
+            assert handle != null;
+            handle.rollback();
+            handle.close();
+            throw new RuntimeException("Error in updating the amount");
+        }
+    }
+
+    private void addHistory(TransactionHistoryDAO transactionHistory, AccountAction action, String fromUser, String toUser, long fromAccountId, long toAccountId, double amount) {
         String message = "";
         switch (action) {
             case TRANSFERRED:
                 message = AccountAction.TRANSFERRED.toString() + " amount " + amount + " to user = " + toUser ;
-                transactionHistoryDAO.add(fromAccountId, message);
+                transactionHistory.add(fromAccountId, message);
                 break;
             case RECEIVED:
                 message = AccountAction.RECEIVED.toString() + " amount " + amount + " from user = " + fromUser ;
-                transactionHistoryDAO.add(toAccountId, message);
+                transactionHistory.add(toAccountId, message);
                 break;
             default :
                 break;

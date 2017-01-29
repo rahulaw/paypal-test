@@ -3,15 +3,15 @@ package com.paypal.test;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
-import com.paypal.test.filters.AuthenticationFilter;
 import com.paypal.test.resources.AccountResource;
+import com.paypal.test.resources.AuthResource;
+import com.paypal.test.filters.AuthenticationFilter;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.skife.jdbi.v2.DBI;
-import com.paypal.test.resources.AuthResource;
 import com.paypal.test.resources.UserResource;
 
 /**

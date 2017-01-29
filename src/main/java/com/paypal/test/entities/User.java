@@ -1,5 +1,6 @@
 package com.paypal.test.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
@@ -16,6 +17,7 @@ public class User {
     private String userName ;
     private String email;
     private boolean isAdmin ;
+    @JsonIgnore
     private String password ;
 
     public User(long id, String userName, String email, boolean isAdmin, String password) {

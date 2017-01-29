@@ -1,9 +1,9 @@
 package com.paypal.test.filters;
 
 import com.google.inject.Inject;
-import com.paypal.test.annotations.Secured;
 import com.paypal.test.api.TokenAPI;
 import com.paypal.test.models.ErrorResponse;
+import com.paypal.test.annotations.Secured;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Priority;

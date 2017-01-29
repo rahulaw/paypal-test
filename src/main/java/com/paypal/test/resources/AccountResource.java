@@ -3,7 +3,10 @@ package com.paypal.test.resources;
 import com.google.inject.Inject;
 import com.paypal.test.annotations.Secured;
 import com.paypal.test.api.AccountAPI;
-import com.paypal.test.models.*;
+import com.paypal.test.models.AccountDetailResponse;
+import com.paypal.test.models.ErrorResponse;
+import com.paypal.test.models.TransactionResponse;
+import com.paypal.test.models.TransferBalanceRequest;
 import com.paypal.test.utils.TokenHelper;
 import lombok.RequiredArgsConstructor;
 

@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.paypal.test.annotations.Secured;
 import com.paypal.test.api.UserAPI;
 import com.paypal.test.entities.User;
+import com.paypal.test.models.ErrorResponse;
 import com.paypal.test.models.CreateUserRequest;
 import com.paypal.test.models.CreateUserResponse;
-import com.paypal.test.models.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.ConstraintViolation;

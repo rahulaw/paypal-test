@@ -33,6 +33,12 @@ public class UserModule extends AbstractModule {
 
     @Provides
     @Singleton
+    DBI provideJDBI() {
+        return masterJdbi;
+    }
+
+    @Provides
+    @Singleton
     SessionFactory makeSessionFactory(SessionFactoryInitializer sessionFactoryInitializer) {
         SessionFactory sessionFactory = sessionFactoryInitializer.getSessionFactory();
         return sessionFactory;
@@ -40,8 +46,8 @@ public class UserModule extends AbstractModule {
 
     @Provides
     @Singleton
-    SessionFactoryInitializer makeSessionFactoryInitializer(UserConfiguration databaseConfig) {
-        return new SessionFactoryInitializer(databaseConfig);
+    SessionFactoryInitializer makeSessionFactoryInitializer() {
+        return new SessionFactoryInitializer(config);
     }
 
 

@@ -17,7 +17,9 @@ app.controller('PaymentController', function($scope,$rootScope,$timeout,$http,$l
                     console.log(response.data);
                     $scope.accountDetails = response.data;
                 }, function (error)  {
-
+                    if(error.status == 401) {
+                        $location.path("/login");
+                    }
                 });
         }
 
@@ -39,6 +41,9 @@ app.controller('PaymentController', function($scope,$rootScope,$timeout,$http,$l
                 }, function (error)  {
                     $scope.isSuccess = false ;
                     $scope.error_message = error.data.message;
+                    if(error.status == 401) {
+                        $location.path("/login");
+                    }
                 });
         }
     }
